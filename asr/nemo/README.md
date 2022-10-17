@@ -6,3 +6,13 @@
 python process_asr_tokenizer.py --manifest test_manifest.json --data_root tmp --tokenizer spe --vocab_size 5000
 ```
 
+
+
+## ASR 학습
+
+### Conformer-CTC
+
+```bash
+python asr_conformer_ctc_train_hydra.py --config-name=conformer_ctc_bpe model.optim.lr=0.01
+```
+
