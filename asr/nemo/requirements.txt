@@ -1,8 +1,10 @@
 tokenizers
-nemo-toolkit
-pytorch-lightning
-hydra-core
+nemo-toolkit==1.10.0
+pytorch-lightning==1.6.4
+hydra-core==1.1.2
 transformers
+webdataset
+wandb
 sentencepiece<1.0.0
 youtokentome>=1.0.5
 pandas
