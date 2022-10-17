@@ -40,3 +40,16 @@ AI 허브에서 다운로드한 데이터를 data 디렉토리 하위 경로로 
 
 - eval_clean: 3,000개
 - eval_other: 3,000개
+
+
+
+## data 전처리
+
+### pcm 데이터를 wav로 변환
+
+아래의 코드를 이용하여 pcm을 wav로 변환이 가능하다.
+
+```bash
+python utils/pcm2wav.py --data_path ../data/KsponSpeech_eval
+```
+
