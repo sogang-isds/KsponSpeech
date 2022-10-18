@@ -55,11 +55,11 @@ python utils/pcm2wav.py --data_path ../data/KsponSpeech_eval
 
 ### transcript 파일을 manifest 파일로 변환
 
-아래의 코드를 이용하여 transcript 파일을 manifest 파일 형식으로 변환할 수 있다.
+아래의 코드를 이용하여 transcript 파일을 manifest 파일 형식으로 변환할 수 있다. 변환하고자 하는 데이터셋을 argument로 넣어주면 된다.
 
 ```bash
 cd utils
-python build_manifest.py --train True --dev True --test True
+python build_manifest.py --train --dev --test
 ```
 
 ### 저장된 manifest 파일에 데이터 변환 규칙을 적용

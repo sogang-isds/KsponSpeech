@@ -7,9 +7,9 @@ from tqdm import tqdm
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train', type=bool, default=True)
-    parser.add_argument('--dev', type=bool, default=True)
-    parser.add_argument('--test', type=bool, default=True)
+    parser.add_argument('--train',  default=False, action='store_true')
+    parser.add_argument('--dev',  default=False,  action='store_true')
+    parser.add_argument('--test',  default=False, action='store_true')
     args = parser.parse_args()
 
     return args
@@ -95,7 +95,7 @@ def build_train_valid_manifest(DATA_PATH):
 def main():
     args = parse_args()
 
-    if args.train == True:
+    if args.train:
         DATA_PATH = '../data/KsponSpeech_train/'
         TRN_PATH = '../data/KsponSpeech_scripts/train.trn'
         DEST_PATH = '../asr/nemo/manifests/'
@@ -106,7 +106,7 @@ def main():
         data = build_manifest(DATA_PATH, TRN_PATH)
         save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
-    if args.dev == True:
+    if args.dev:
         DATA_PATH = '../data/KsponSpeech_train/'
         TRN_PATH = '../data/KsponSpeech_scripts/dev.trn'
         DEST_PATH = '../asr/nemo/manifests/'
@@ -117,7 +117,7 @@ def main():
         data = build_manifest(DATA_PATH, TRN_PATH)
         save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
-    if args.test == True:
+    if args.test:
         DATA_PATH = '../data/'
         TRN_PATH = '../data/KsponSpeech_scripts/'
         DEST_PATH = '../asr/nemo/manifests/'
