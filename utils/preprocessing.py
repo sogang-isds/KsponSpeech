@@ -2,6 +2,7 @@ import os
 import re
 import json
 from tqdm import tqdm
+import argparse
 
 
 # reference from https://github.com/sooftware/ksponspeech
@@ -115,17 +116,31 @@ def read_preprocess_file(file_path, mode):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
     from build_manifest import save_to_json
+    parser.add_argument('--mode',
+                        type=str,
+                        help='phonetic or spelling',
+                        default='phonetic')
+    parser.add_argument('--manifest_path',
+                        type=str,
+                        help='manifest path',
+                        default="../asr/nemo/manifests/")
+    parser.add_argument('--save_path',
+                        type=str,
+                        help='save path',
+                        default='../asr/nemo/manifests/preprocessed/')
+    args = parser.parse_args()
 
-    MANIFEST_PATH = "../asr/nemo/manifests/"
-    DEST_PATH = '../asr/nemo/manifests/preprocessed/'
+    MANIFEST_PATH = args.manifest_path
+    DEST_PATH = args.save_path
 
     if not os.path.isdir(DEST_PATH):
         os.mkdir(DEST_PATH)
 
     for file in os.listdir(MANIFEST_PATH):
         if file.endswith('.json') and not 'sample' in file:
-            data = read_preprocess_file(MANIFEST_PATH + file, mode='phonetic')
+            data = read_preprocess_file(MANIFEST_PATH + file, mode=args.mode)
             save_to_json(DEST_PATH, data, file.split('.')[0])
 
     print('Finished preprocessing manifest')

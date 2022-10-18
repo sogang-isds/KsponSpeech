@@ -68,5 +68,5 @@ python build_manifest.py --train --dev --test
 
 ```bash
 cd utils
-python preprocessing.py  
+python preprocessing.py --mode phonetic
 ```

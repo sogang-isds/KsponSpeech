@@ -95,42 +95,46 @@ def build_train_valid_manifest(DATA_PATH):
 def main():
     args = parse_args()
 
-    if args.train:
-        DATA_PATH = '../data/KsponSpeech_train/'
-        TRN_PATH = '../data/KsponSpeech_scripts/train.trn'
-        DEST_PATH = '../asr/nemo/manifests/'
+    if (args.train and args.dev and args.test) == False:
+        print('Please select the data you want to build manifest')
 
-        if not os.path.isdir(DEST_PATH):
-            os.mkdir(DEST_PATH)
+    else:
+        if args.train:
+            DATA_PATH = '../data/KsponSpeech_train/'
+            TRN_PATH = '../data/KsponSpeech_scripts/train.trn'
+            DEST_PATH = '../asr/nemo/manifests/'
 
-        data = build_manifest(DATA_PATH, TRN_PATH)
-        save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
+            if not os.path.isdir(DEST_PATH):
+                os.mkdir(DEST_PATH)
 
-    if args.dev:
-        DATA_PATH = '../data/KsponSpeech_train/'
-        TRN_PATH = '../data/KsponSpeech_scripts/dev.trn'
-        DEST_PATH = '../asr/nemo/manifests/'
+            data = build_manifest(DATA_PATH, TRN_PATH)
+            save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
-        if not os.path.isdir(DEST_PATH):
-            os.mkdir(DEST_PATH)
+        if args.dev:
+            DATA_PATH = '../data/KsponSpeech_train/'
+            TRN_PATH = '../data/KsponSpeech_scripts/dev.trn'
+            DEST_PATH = '../asr/nemo/manifests/'
 
-        data = build_manifest(DATA_PATH, TRN_PATH)
-        save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
+            if not os.path.isdir(DEST_PATH):
+                os.mkdir(DEST_PATH)
 
-    if args.test:
-        DATA_PATH = '../data/'
-        TRN_PATH = '../data/KsponSpeech_scripts/'
-        DEST_PATH = '../asr/nemo/manifests/'
+            data = build_manifest(DATA_PATH, TRN_PATH)
+            save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
-        if not os.path.isdir(DEST_PATH):
-            os.mkdir(DEST_PATH)
+        if args.test:
+            DATA_PATH = '../data/'
+            TRN_PATH = '../data/KsponSpeech_scripts/'
+            DEST_PATH = '../asr/nemo/manifests/'
 
-        for file in os.listdir(TRN_PATH):
-            if file.endswith('.trn') and file.startswith('eval'):
-                data = build_manifest(DATA_PATH, TRN_PATH + file)
-                save_to_json(DEST_PATH, data, file.split('.')[0])
+            if not os.path.isdir(DEST_PATH):
+                os.mkdir(DEST_PATH)
 
-    print('Finished building manifest')
+            for file in os.listdir(TRN_PATH):
+                if file.endswith('.trn') and file.startswith('eval'):
+                    data = build_manifest(DATA_PATH, TRN_PATH + file)
+                    save_to_json(DEST_PATH, data, file.split('.')[0])
+
+        print('Finished building manifest')
 
 
 if __name__ == '__main__':
