@@ -36,7 +36,7 @@ def build_manifest(DATA_PATH, TRN_PATH):
                 duration = sox.file_info.duration(wav_path)
 
                 manifest = {
-                    'audio_filepath': wav_path,
+                    'audio_filepath': '../' + wav_path,
                     'duration': duration,
                     'text': text
                 }
@@ -95,12 +95,12 @@ def build_train_valid_manifest(DATA_PATH):
 def main():
     args = parse_args()
 
-    if (args.train and args.dev and args.test) == False:
+    if not (args.train or args.dev or args.test):
         print('Please select the data you want to build manifest')
 
     else:
         if args.train:
-            DATA_PATH = '../../data/KsponSpeech_train/'
+            DATA_PATH = '../data/KsponSpeech_train/'
             TRN_PATH = '../data/KsponSpeech_scripts/train.trn'
             DEST_PATH = '../asr/nemo/manifests/'
 
@@ -111,7 +111,7 @@ def main():
             save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
         if args.dev:
-            DATA_PATH = '../../data/KsponSpeech_train/'
+            DATA_PATH = '../data/KsponSpeech_train/'
             TRN_PATH = '../data/KsponSpeech_scripts/dev.trn'
             DEST_PATH = '../asr/nemo/manifests/'
 
@@ -122,7 +122,7 @@ def main():
             save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
         if args.test:
-            DATA_PATH = '../../data/'
+            DATA_PATH = '../data/'
             TRN_PATH = '../data/KsponSpeech_scripts/'
             DEST_PATH = '../asr/nemo/manifests/'
 
