@@ -53,3 +53,20 @@ AI 허브에서 다운로드한 데이터를 data 디렉토리 하위 경로로 
 python utils/pcm2wav.py --data_path ../data/KsponSpeech_eval
 ```
 
+### transcript 파일을 manifest 파일로 변환
+
+아래의 코드를 이용하여 transcript 파일을 manifest 파일 형식으로 변환할 수 있다.
+
+```bash
+cd utils
+python build_manifest.py --train True --dev True --test True
+```
+
+### 저장된 manifest 파일에 데이터 변환 규칙을 적용
+
+아래의 코드를 이용하여 정리된 데이터 변환 규칙을 적용, 저장할 수 있다.
+
+```bash
+cd utils
+python preprocessing.py  
+```
