@@ -1,6 +1,6 @@
 ### Custom template
 .idea
-
+data/*
 
 ### JupyterNotebooks template
 # gitignore template for Jupyter Notebooks
