@@ -117,13 +117,15 @@ def read_preprocess_file(file_path, mode):
 if __name__ == '__main__':
     from build_manifest import save_to_json
 
-    MANIFEST_PATH = "../manifest/"
-    DEST_PATH = '../manifest/preprocessed/'
+    MANIFEST_PATH = "../asr/nemo/manifests/"
+    DEST_PATH = '../asr/nemo/manifests/preprocessed/'
 
     if not os.path.isdir(DEST_PATH):
         os.mkdir(DEST_PATH)
 
     for file in os.listdir(MANIFEST_PATH):
-        if file.endswith('.json'):
+        if file.endswith('.json') and not 'sample' in file:
             data = read_preprocess_file(MANIFEST_PATH + file, mode='phonetic')
             save_to_json(DEST_PATH, data, file.split('.')[0])
+
+    print('Finished preprocessing manifest')
