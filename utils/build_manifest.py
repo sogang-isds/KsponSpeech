@@ -100,7 +100,7 @@ def main():
 
     else:
         if args.train:
-            DATA_PATH = '../data/KsponSpeech_train/'
+            DATA_PATH = '../../data/KsponSpeech_train/'
             TRN_PATH = '../data/KsponSpeech_scripts/train.trn'
             DEST_PATH = '../asr/nemo/manifests/'
 
@@ -111,7 +111,7 @@ def main():
             save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
         if args.dev:
-            DATA_PATH = '../data/KsponSpeech_train/'
+            DATA_PATH = '../../data/KsponSpeech_train/'
             TRN_PATH = '../data/KsponSpeech_scripts/dev.trn'
             DEST_PATH = '../asr/nemo/manifests/'
 
@@ -122,7 +122,7 @@ def main():
             save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
 
         if args.test:
-            DATA_PATH = '../data/'
+            DATA_PATH = '../../data/'
             TRN_PATH = '../data/KsponSpeech_scripts/'
             DEST_PATH = '../asr/nemo/manifests/'
 
