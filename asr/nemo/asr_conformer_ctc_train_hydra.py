@@ -19,7 +19,7 @@ from omegaconf import OmegaConf, open_dict
 def main(cfg):
     logging.info(f'Hydra config: {OmegaConf.to_yaml(cfg)}')
 
-    cfg.model.tokenizer.dir = "tokenizers/sample/tokenizer_spe_unigram_v5000/"  # note this is a directory, not a path to a vocabulary file
+    cfg.model.tokenizer.dir = "tmp/tokenizer_spe_bpe_v5000/"  # note this is a directory, not a path to a vocabulary file
     cfg.model.tokenizer.type = "bpe"
 
     import pytorch_lightning as pl
@@ -30,8 +30,8 @@ def main(cfg):
     trainer = pl.Trainer(**cfg.trainer)
     exp_manager(trainer, cfg.get("exp_manager", None))
 
-    train_manifest = 'manifests/train_sample_manifest.json'
-    dev_manifest = 'manifests/dev_sample_manifest.json'
+    train_manifest = 'manifests/preprocessed/train.json'
+    dev_manifest = 'manifests/preprocessed/dev.json'
 
     # Update paths to dataset
     cfg.model.train_ds.manifest_filepath = train_manifest

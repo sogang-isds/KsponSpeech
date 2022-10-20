@@ -90,19 +90,19 @@ def main():
             os.mkdir('result')
 
         if args.train:
-            manifest_path = '../nemo/manifests/train.json'
+            manifest_path = '../nemo/manifests/preprocessed/train.json'
             inference(manifest_path, model, transcribe_options)
 
         elif args.dev:
-            manifest_path = '../nemo/manifests/dev.json'
+            manifest_path = '../nemo/manifests/preprocessed/dev.json'
             inference(manifest_path, model, transcribe_options)
 
         elif args.eval_clean:
-            manifest_path = '../nemo/manifests/eval_clean.json'
+            manifest_path = '../nemo/manifests/preprocessed/eval_clean.json'
             inference(manifest_path, model, transcribe_options)
 
         else:
-            manifest_path = '../nemo/manifests/eval_other.json'
+            manifest_path = '../nemo/manifests/preprocessed/eval_other.json'
             inference(manifest_path, model, transcribe_options)
 
 

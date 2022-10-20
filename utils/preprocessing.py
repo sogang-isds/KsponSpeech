@@ -59,7 +59,7 @@ def bracket_filter(sentence, mode='phonetic'):
 def special_filter(sentence, mode='phonetic', replace=None):
     SENTENCE_MARK = ['?', '!', '.']
     NOISE = ['o', 'n', 'u', 'b', 'l']
-    EXCEPT = ['/', '+', '*', '-', '@', '$', '^', '&', '[', ']', '=', ':', ';', ',']
+    EXCEPT = ['/', '+', '*', '-', '@', '$', '^', '&', '[', ']', '=', ':', ';', ',', '?', '!', '.']
 
     new_sentence = str()
     for idx, ch in enumerate(sentence):
