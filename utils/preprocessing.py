@@ -4,6 +4,7 @@ import json
 from tqdm import tqdm
 import argparse
 
+from utils import save_to_json
 
 # reference from https://github.com/sooftware/ksponspeech
 
@@ -17,6 +18,7 @@ PERCENT_FILES = {
     '542363': '프로',
     '581483': '퍼센트'
 }
+
 
 def bracket_filter(sentence, mode='phonetic'):
     new_sentence = str()
@@ -117,7 +119,7 @@ def read_preprocess_file(file_path, mode):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    from build_manifest import save_to_json
+
     parser.add_argument('--mode',
                         type=str,
                         help='phonetic or spelling',
@@ -140,7 +142,11 @@ if __name__ == '__main__':
 
     for file in os.listdir(MANIFEST_PATH):
         if file.endswith('.json') and not 'sample' in file:
-            data = read_preprocess_file(MANIFEST_PATH + file, mode=args.mode)
-            save_to_json(DEST_PATH, data, file.split('.')[0])
+            in_file = os.path.join(MANIFEST_PATH, file)
+            print(f'Processing: {in_file}')
+            data = read_preprocess_file(in_file, mode=args.mode)
+            out_file = file.split('.')[0] + '.json'
+            save_to_json(DEST_PATH, data, out_file)
+            print(f'File saved: {os.path.abspath(os.path.join(DEST_PATH, out_file))}')
 
     print('Finished preprocessing manifest')

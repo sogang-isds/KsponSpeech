@@ -1,25 +1,19 @@
 import os
 import sox
-import json
 from tqdm import tqdm
+
+from utils import save_to_json
 
 
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train',  default=False, action='store_true')
-    parser.add_argument('--dev',  default=False,  action='store_true')
-    parser.add_argument('--test',  default=False, action='store_true')
+    parser.add_argument('--train', default=False, action='store_true')
+    parser.add_argument('--dev', default=False, action='store_true')
+    parser.add_argument('--test', default=False, action='store_true')
     args = parser.parse_args()
 
     return args
-
-
-def save_to_json(DEST_PATH, data, filename):
-    with open(DEST_PATH + filename + '.json', 'w', encoding='utf-8') as f:
-        for line in data:
-            json.dump(line, f, ensure_ascii=False)
-            f.write('\n')
 
 
 def build_manifest(DATA_PATH, TRN_PATH):
@@ -61,7 +55,9 @@ def main():
                 os.mkdir(DEST_PATH)
 
             data = build_manifest(DATA_PATH, TRN_PATH)
-            save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
+            out_file = TRN_PATH.split('/')[-1].split('.')[0] + '.json'
+            save_to_json(DEST_PATH, data, out_file)
+            print(f'File saved: {os.path.abspath(os.path.join(DEST_PATH, out_file))}')
 
         if args.dev:
             DATA_PATH = '../data/KsponSpeech_train/'
@@ -72,7 +68,9 @@ def main():
                 os.mkdir(DEST_PATH)
 
             data = build_manifest(DATA_PATH, TRN_PATH)
-            save_to_json(DEST_PATH, data, TRN_PATH.split('/')[-1].split('.')[0])
+            out_file = TRN_PATH.split('/')[-1].split('.')[0] + '.json'
+            save_to_json(DEST_PATH, data, out_file)
+            print(f'File saved: {os.path.abspath(os.path.join(DEST_PATH, out_file))}')
 
         if args.test:
             DATA_PATH = '../data/'
@@ -85,7 +83,9 @@ def main():
             for file in os.listdir(TRN_PATH):
                 if file.endswith('.trn') and file.startswith('eval'):
                     data = build_manifest(DATA_PATH, TRN_PATH + file)
-                    save_to_json(DEST_PATH, data, file.split('.')[0])
+                    out_file = file.split('.')[0] + '.json'
+                    save_to_json(DEST_PATH, data, out_file)
+                    print(f'File saved: {os.path.abspath(os.path.join(DEST_PATH, out_file))}')
 
         print('Finished building manifest')
 
