@@ -45,53 +45,6 @@ def build_manifest(DATA_PATH, TRN_PATH):
         return data
 
 
-def build_train_valid_manifest(DATA_PATH):
-    train_data = []
-    valid_data = []
-    for num in tqdm(range(1, 5)):
-        speech_dir = DATA_PATH + 'KsponSpeech_0{}/'.format(num)
-        print('Processed with', speech_dir)
-        for (path, dirs, files) in os.walk(speech_dir):
-            for subdirs in dirs:
-                if subdirs in ('KsponSpeech_0621', 'KsponSpeech_0622', 'KsponSpeech_0623'):
-                    subdir = os.path.join(speech_dir, subdirs)
-                    for file in os.listdir(subdir):
-                        if file.endswith('.txt'):
-                            with open(subdir + '/' + file, 'r') as f:
-                                content = f.read()
-
-                            text = content.split('\n')
-                            wav_path = subdir + '/' + file.replace('.txt', '.wav')
-                            duration = sox.file_info.duration(wav_path)
-
-                            manifest = {
-                                'audio_filepath': wav_path,
-                                'duration': duration,
-                                'text': text
-                            }
-                            valid_data.append(manifest)
-
-                else:
-                    subdir = os.path.join(speech_dir, subdirs)
-                    for file in os.listdir(subdir):
-                        if file.endswith('.txt'):
-                            with open(subdir + '/' + file, 'r') as f:
-                                content = f.read()
-
-                            text = content.split('\n')
-                            wav_path = subdir + '/' + file.replace('.txt', '.wav')
-                            duration = sox.file_info.duration(wav_path)
-
-                            manifest = {
-                                'audio_filepath': wav_path,
-                                'duration': duration,
-                                'text': text
-                            }
-                            train_data.append(manifest)
-
-    return train_data, valid_data
-
-
 def main():
     args = parse_args()
 
