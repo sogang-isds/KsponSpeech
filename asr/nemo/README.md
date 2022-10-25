@@ -7,7 +7,6 @@ python process_asr_text_tokenizer.py --manifest manifests/preprocessed/train.jso
 ```
 
 
-
 ## ASR 학습
 
 ### Conformer-CTC
@@ -28,3 +27,9 @@ python asr_ctc_model_bpe_train_hydra.py --config-path=./conf/squeezeformer/ --co
 export PL_TORCH_DISTRIBUTED_BACKEND=gloo
 ```
 
+
+## 모델 테스트
+
+```bash
+python test_saved_model.py --asr_model_path conformer_ctc_bpe_model.nemo --test_path manifests/preprocessed/eval_clean.json
+```

@@ -159,7 +159,7 @@ model:
 trainer:
   devices: -1 # number of GPUs, -1 would use all available GPUs
   num_nodes: 1
-  max_epochs: 180
+  max_epochs: 181
   max_steps: null # computed at runtime if not set
   val_check_interval: 1.0 # Set to 0.25 to check 4 times per epoch, or an int for number of iterations
   accelerator: gpu
@@ -193,7 +193,7 @@ exp_manager:
   resume_ignore_no_checkpoint: true
 
   # You may use this section to create a W&B logger
-  create_wandb_logger: True
+  create_wandb_logger: true
   wandb_logger_kwargs:
     name: conformer_ctc_bpe_v5000
     project: nemo-asr-conformer
