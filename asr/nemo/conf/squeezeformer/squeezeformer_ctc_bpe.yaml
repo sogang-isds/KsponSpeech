@@ -1,31 +1,25 @@
-# It contains the default values for training a Conformer-CTC ASR model, large size (~120M) with CTC loss and sub-word encoding.
+# It contains the default values for training a Squeezeformer-CTC ASR model, large size (~120M) with CTC loss and sub-word encoding.
 
 # Architecture and training config:
 # Default learning parameters in this config are set for effective batch size of 2K. To train it with smaller effective
 # batch sizes, you may need to re-tune the learning parameters or use higher accumulate_grad_batches.
-# Here are the recommended configs for different variants of Conformer-CTC, other parameters are the same as in this config file.
+# Here are the recommended configs for different variants of Squeezeformer-CTC, other parameters are the same as in this config file.
 # One extra layer (compared to original paper) is added to the medium and large variants to compensate for replacing the LSTM decoder with a linear one.
 #
-#  +-------------+---------+---------+----------+------------+-----+
-#  | Model       | d_model | n_heads | n_layers | time_masks | lr  |
-#  +=============+=========+========+===========+============+=====+
-#  | Small  (13M)|   176   |    4   |    16     |     5      | 5.0 |
-#  +-------------+---------+--------+-----------+------------+-----+
-#  | Medium (30M)|   256   |    4   |    18     |     5      | 5.0 |
-#  +-------------+---------+--------+-----------+------------+-----+
-#  | Large (121M)|   512   |    8   |    18     |     10     | 2.0 |
-#  +---------------------------------------------------------------+
+# | Model        | d_model | n_layers | n_heads | time_masks | lr     | time_reduce_idx | GBS  |
+# |--------------|---------|----------|---------|------------|--------|-----------------|------|
+# | Extra-Small  | 144     | 16       | 4       | 5          | 2e-3   | 7               | 1024 |
+# | Small        | 196     | 18       | 4       | 5          | 2e-3   | 8               | 1024 |
+# | Small-Medium | 256     | 16       | 4       | 5          | 1.5e-3 | 7               | 1024 |
+# | Medium       | 324     | 20       | 4       | 7          | 1.5e-3 | 9               | 1024 |
+# | Medium-Large | 512     | 18       | 8       | 10         | 1e-3   | 8               | 2048 |
+# | Large        | 640     | 22       | 8       | 10         | 5e-4   | 10              | 2048 |
 #
-# If you do not want to train with AMP, you may use weight decay of 0.0 or reduce the number of time maskings to 2
-# with time_width=100. It may help when you want to train for fewer epochs and need faster convergence.
-# With weight_decay=0.0, learning rate may need to get reduced to 2.0.
+# You may find more info about Squeezeformer-CTC here: https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/asr/models.html#squeezeformer-ctc
+# Pre-trained models of Squeezeformer-CTC can be found here: https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/asr/results.html
 
-# You may find more info about Conformer-CTC here: https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/asr/models.html#conformer-ctc
-# Pre-trained models of Conformer-CTC can be found here: https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/asr/results.html
-# The checkpoint of the large model trained on LibriSpeech with this recipe can be found here: https://ngc.nvidia.com/catalog/models/nvidia:nemo:stt_en_conformer_ctc_large_ls
+name: "Squeezeformer-CTC-BPE"
 
-name: "Conformer-CTC-BPE"
-batch_size: 64
 model:
   sample_rate: 16000
   log_prediction: true # enables logging sample predictions in the output during training
@@ -35,7 +29,7 @@ model:
   train_ds:
     manifest_filepath: ???
     sample_rate: ${model.sample_rate}
-    batch_size: ${batch_size} # you may increase batch_size if your memory allows
+    batch_size: 32 # you may increase batch_size if your memory allows
     shuffle: true
     num_workers: 8
     pin_memory: true
@@ -54,7 +48,7 @@ model:
   validation_ds:
     manifest_filepath: ???
     sample_rate: ${model.sample_rate}
-    batch_size: ${batch_size} # you may increase batch_size if your memory allows
+    batch_size: 32 # you may increase batch_size if your memory allows
     shuffle: false
     num_workers: 8
     pin_memory: true
@@ -63,7 +57,7 @@ model:
   test_ds:
     manifest_filepath: null
     sample_rate: ${model.sample_rate}
-    batch_size: ${batch_size} # you may increase batch_size if your memory allows
+    batch_size: 32 # you may increase batch_size if your memory allows
     shuffle: false
     num_workers: 8
     pin_memory: true
@@ -99,14 +93,19 @@ model:
     time_width: 0.05
 
   encoder:
-    _target_: nemo.collections.asr.modules.ConformerEncoder
+    _target_: nemo.collections.asr.modules.SqueezeformerEncoder
     feat_in: ${model.preprocessor.features}
     feat_out: -1 # you may set it if you need different output size other than the default d_model
     n_layers: 18
     d_model: 512
 
+    # Squeezeformer params
+    adaptive_scale: true
+    time_reduce_idx: 8
+    time_recovery_idx: null
+
     # Sub-sampling params
-    subsampling: striding # vggnet or striding, vggnet may give better results but needs more memory
+    subsampling: dw_striding # dw_striding, vggnet, striding or stacking, vggnet may give better results but needs more memory
     subsampling_factor: 4 # must be power of 2
     subsampling_conv_channels: -1 # -1 sets it to d_model
 
@@ -139,7 +138,7 @@ model:
 
   optim:
     name: adamw
-    lr: 0.5
+    lr: 0.1
     # optimizer arguments
     betas: [0.9, 0.98]
     # less necessity for weight_decay as we already have large augmentations with SpecAug
@@ -149,32 +148,35 @@ model:
 
     # scheduler setup
     sched:
-      name: NoamAnnealing
-      d_model: ${model.encoder.d_model}
+      name: NoamHoldAnnealing
       # scheduler config override
-      warmup_steps: 10000
+      warmup_steps: 5000  # paper uses ~ 6500 steps (20 epochs) out of 500 epochs.
       warmup_ratio: null
+      hold_steps: 40000
+      hold_ratio: null  # paper uses ~ 40000 steps (160 epochs) out of 500 epochs.
+      decay_rate: 1.0  # Noam decay = 0.5 and no hold steps. For Squeezeformer, use hold ~ 10-30% of training, then faster decay.
       min_lr: 1e-6
 
 trainer:
   devices: -1 # number of GPUs, -1 would use all available GPUs
   num_nodes: 1
-  max_epochs: 180
+  max_epochs: 150
   max_steps: null # computed at runtime if not set
   val_check_interval: 1.0 # Set to 0.25 to check 4 times per epoch, or an int for number of iterations
-  accelerator: gpu
+  accelerator: auto
   strategy: ddp
   accumulate_grad_batches: 2
   gradient_clip_val: 0.0
-  precision: 16 # Should be set to 16 for O1 and O2 to enable the AMP.
+  precision: 32 # Should be set to 16 for O1 and O2 to enable the AMP.
   log_every_n_steps: 10000  # Interval of logging.
-  progress_bar_refresh_rate: 10
+  enable_progress_bar: True
   resume_from_checkpoint: null # The path to a checkpoint file to continue the training, restores the whole state including the epoch, step, LR schedulers, apex, etc.
   num_sanity_val_steps: 0 # number of steps to perform validation steps for sanity check the validation process before starting the training, setting to 0 disables it
   check_val_every_n_epoch: 1 # number of evaluations on validation every n epochs
   sync_batchnorm: true
   enable_checkpointing: False  # Provided by exp_manager
   logger: false  # Provided by exp_manager
+  benchmark: false # needs to be false for models with variable-length speech input as it slows down training
 
 exp_manager:
   exp_dir: null
@@ -189,11 +191,11 @@ exp_manager:
     always_save_nemo: True # saves the checkpoints as nemo files instead of PTL checkpoints
 
   # you need to set these two to True to continue the training
-  resume_if_exists: true
-  resume_ignore_no_checkpoint: true
+  resume_if_exists: false
+  resume_ignore_no_checkpoint: false
 
   # You may use this section to create a W&B logger
-  create_wandb_logger: True
+  create_wandb_logger: true
   wandb_logger_kwargs:
-    name: conformer_ctc_bpe_v5000
+    name: squeezeformer_ctc_bpe_v5000
     project: nemo-asr-conformer

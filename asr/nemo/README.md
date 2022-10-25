@@ -13,7 +13,13 @@ python process_asr_text_tokenizer.py --manifest manifests/preprocessed/train.jso
 ### Conformer-CTC
 
 ```bash
-python asr_conformer_ctc_train_hydra.py --config-name=conformer_ctc_bpe model.optim.lr=0.01
+python asr_ctc_model_bpe_train_hydra.py --config-path=./conf/conformer/ --config-name=conformer_ctc_bpe model.optim.lr=0.01
+```
+
+### Squeezeformer-CTC
+
+```bash
+python asr_ctc_model_bpe_train_hydra.py --config-path=./conf/squeezeformer/ --config-name=squeezeformer_ctc_bpe
 ```
 
 학습 시 distributed_backend=nccl 이후에 안넘어 가는 경우 아래와 같이 변경 후 다시 실행
