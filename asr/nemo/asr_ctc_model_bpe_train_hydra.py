@@ -37,15 +37,18 @@ def main(cfg):
     cfg.model.train_ds.manifest_filepath = train_manifest
     cfg.model.validation_ds.manifest_filepath = dev_manifest
 
-    first_asr_model = nemo_asr.models.EncDecCTCModelBPE(cfg=cfg.model, trainer=trainer)
+    asr_model = nemo_asr.models.EncDecCTCModelBPE(cfg=cfg.model, trainer=trainer)
 
     from pytorch_lightning.utilities.model_summary import summarize
-    summarize(first_asr_model)
+    summarize(asr_model)
 
     # Start training!!!
-    trainer.fit(first_asr_model)
+    trainer.fit(asr_model)
 
-    first_asr_model.save_to("conformer_ctc_bpe_model.nemo")
+    if cfg.name == 'Conformer-CTC-BPE':
+        asr_model.save_to("conformer_ctc_bpe_model.nemo")
+    elif cfg.name == 'Squeezeformer-CTC-BPE':
+        asr_model.save_to("squeezeformer_ctc_bpe_model.nemo")
 
 
 if __name__ == '__main__':
