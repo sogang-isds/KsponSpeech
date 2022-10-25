@@ -1,5 +1,5 @@
 tokenizers
-nemo-toolkit==1.10.0
+nemo-toolkit==1.11.0
 pytorch-lightning==1.6.4
 hydra-core==1.1.2
 transformers
