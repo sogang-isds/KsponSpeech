@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
     torch.set_grad_enabled(False)
 
-    asr_model = nemo_asr.models.EncDecCTCModelBPE.restore_from(restore_path='conformer_ctc_bpe_model.nemo')
+    asr_model = nemo_asr.models.EncDecCTCModelBPE.restore_from(restore_path=args.asr_model_path)
     asr_model.setup_test_data(
         test_data_config={
             'sample_rate': 16000,
