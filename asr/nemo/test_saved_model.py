@@ -78,11 +78,12 @@ def main():
 
     data = pd.DataFrame(dict(reference=references, hypothesis=hypotheses))
     file_name = args.test_path.split('/')[-1].split('.')[0]
+    model_name = args.asr_model_path.split('.ne')[0]
 
-    if not os.path.isdir('result'):
-        os.mkdir('result')
-    data.to_csv(f'result/{file_name}_result.csv', index=False, encoding="utf-8-sig")
-    logging.info(f'Prediction Result saved: result/{file_name}_result.csv')
+    if not os.path.isdir(f'result/{model_name}'):
+        os.mkdir(f'result/{model_name}')
+    data.to_csv(f'result/{model_name}/{file_name}_result.csv', index=False, encoding="utf-8-sig")
+    logging.info(f'Prediction Result saved: result/{model_name}/{file_name}_result.csv')
 
 
 if __name__ == '__main__':
