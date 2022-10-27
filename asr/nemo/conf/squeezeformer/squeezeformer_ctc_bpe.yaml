@@ -19,7 +19,7 @@
 # Pre-trained models of Squeezeformer-CTC can be found here: https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/asr/results.html
 
 name: "Squeezeformer-CTC-BPE"
-
+batch_size: 32
 model:
   sample_rate: 16000
   log_prediction: true # enables logging sample predictions in the output during training
@@ -29,7 +29,7 @@ model:
   train_ds:
     manifest_filepath: ???
     sample_rate: ${model.sample_rate}
-    batch_size: 32 # you may increase batch_size if your memory allows
+    batch_size: ${batch_size} # you may increase batch_size if your memory allows
     shuffle: true
     num_workers: 8
     pin_memory: true
@@ -48,7 +48,7 @@ model:
   validation_ds:
     manifest_filepath: ???
     sample_rate: ${model.sample_rate}
-    batch_size: 32 # you may increase batch_size if your memory allows
+    batch_size: ${batch_size} # you may increase batch_size if your memory allows
     shuffle: false
     num_workers: 8
     pin_memory: true
@@ -57,7 +57,7 @@ model:
   test_ds:
     manifest_filepath: null
     sample_rate: ${model.sample_rate}
-    batch_size: 32 # you may increase batch_size if your memory allows
+    batch_size: ${batch_size} # you may increase batch_size if your memory allows
     shuffle: false
     num_workers: 8
     pin_memory: true
@@ -88,7 +88,7 @@ model:
     _target_: nemo.collections.asr.modules.SpectrogramAugmentation
     freq_masks: 2 # set to zero to disable it
     # you may use lower time_masks for smaller models to have a faster convergence
-    time_masks: 10 # set to zero to disable it
+    time_masks: 5 # set to zero to disable it
     freq_width: 27
     time_width: 0.05
 
@@ -96,12 +96,12 @@ model:
     _target_: nemo.collections.asr.modules.SqueezeformerEncoder
     feat_in: ${model.preprocessor.features}
     feat_out: -1 # you may set it if you need different output size other than the default d_model
-    n_layers: 18
-    d_model: 512
+    n_layers: 16
+    d_model: 256
 
     # Squeezeformer params
     adaptive_scale: true
-    time_reduce_idx: 8
+    time_reduce_idx: 7
     time_recovery_idx: null
 
     # Sub-sampling params
@@ -114,7 +114,7 @@ model:
 
     # Multi-headed Attention Module's params
     self_attention_model: rel_pos # rel_pos or abs_pos
-    n_heads: 8 # may need to be lower for smaller d_models
+    n_heads: 4 # may need to be lower for smaller d_models
     # [left, right] specifies the number of steps to be seen from left and right of each step in self-attention
     att_context_size: [-1, -1] # -1 means unlimited context
     xscaling: true # scales up the input embeddings by sqrt(d_model)
@@ -138,7 +138,7 @@ model:
 
   optim:
     name: adamw
-    lr: 0.1
+    lr:  1.5e-3
     # optimizer arguments
     betas: [0.9, 0.98]
     # less necessity for weight_decay as we already have large augmentations with SpecAug
@@ -197,5 +197,5 @@ exp_manager:
   # You may use this section to create a W&B logger
   create_wandb_logger: true
   wandb_logger_kwargs:
-    name: squeezeformer_ctc_bpe_v5000
+    name: squeezeformer_ctc_bpe_SM_v5000
     project: nemo-asr-conformer
