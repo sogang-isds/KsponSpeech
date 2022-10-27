@@ -139,7 +139,7 @@ model:
 
   optim:
     name: adamw
-    lr: 0.5
+    lr: 0.1
     # optimizer arguments
     betas: [0.9, 0.98]
     # less necessity for weight_decay as we already have large augmentations with SpecAug
@@ -152,14 +152,14 @@ model:
       name: NoamAnnealing
       d_model: ${model.encoder.d_model}
       # scheduler config override
-      warmup_steps: 10000
+      warmup_steps: 2000
       warmup_ratio: null
       min_lr: 1e-6
 
 trainer:
   devices: -1 # number of GPUs, -1 would use all available GPUs
   num_nodes: 1
-  max_epochs: 181
+  max_epochs: 300
   max_steps: null # computed at runtime if not set
   val_check_interval: 1.0 # Set to 0.25 to check 4 times per epoch, or an int for number of iterations
   accelerator: gpu
@@ -167,7 +167,7 @@ trainer:
   accumulate_grad_batches: 2
   gradient_clip_val: 0.0
   precision: 16 # Should be set to 16 for O1 and O2 to enable the AMP.
-  log_every_n_steps: 10000  # Interval of logging.
+  log_every_n_steps: 20000  # Interval of logging.
   progress_bar_refresh_rate: 10
   resume_from_checkpoint: null # The path to a checkpoint file to continue the training, restores the whole state including the epoch, step, LR schedulers, apex, etc.
   num_sanity_val_steps: 0 # number of steps to perform validation steps for sanity check the validation process before starting the training, setting to 0 disables it
@@ -195,5 +195,5 @@ exp_manager:
   # You may use this section to create a W&B logger
   create_wandb_logger: true
   wandb_logger_kwargs:
-    name: conformer_ctc_bpe_v5000
+    name: conformer_ctc_bpe_v5000_lr_0.1
     project: nemo-asr-conformer
