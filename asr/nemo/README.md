@@ -33,3 +33,10 @@ export PL_TORCH_DISTRIBUTED_BACKEND=gloo
 ```bash
 python test_saved_model.py --asr_model_path conformer_ctc_bpe_model.nemo --test_path manifests/preprocessed/eval_clean.json
 ```
+
+### 병렬처리로 음성인식 추론
+
+```bash
+model='models/model.nemo' predict_ds.manifest_filepath=manifests/preprocessed/eval_clean.json predict_ds.batch_size=50 trainer.precision=16 output_path=results use_cer=true
+```
+
