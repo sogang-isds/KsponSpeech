@@ -57,7 +57,7 @@ def inference(manifest_path, model, transcribe_options):
         transcriptions.append(hypothesis.text)
         references.append(text)
 
-    data = pd.DataFrame(dict(audio_filepaeh=audio_filepaths, reference=references, hypothesis=transcriptions))
+    data = pd.DataFrame(dict(audio_filepath=audio_filepaths, reference=references, hypothesis=transcriptions))
     data.to_csv(f'result/{file_name}_result.csv', index=False, encoding="utf-8-sig")
 
     normalizer = BasicTextNormalizer()
