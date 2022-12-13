@@ -3,11 +3,7 @@ import csv
 import os
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input_file', default='input.csv', type=str)
-    args = parser.parse_args()
-
+def get_annotate_error_candidates(input_file):
     cer_threshold = 0.02
     ppl_threshold = 0.15
     cer_candidate_count = 0
@@ -16,7 +12,7 @@ if __name__ == '__main__':
 
     machine_craft_file = []
 
-    with open(args.input_file, 'r', encoding='utf-8') as f:
+    with open(input_file, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         header = next(reader)
 
@@ -28,6 +24,9 @@ if __name__ == '__main__':
             audio_filepath = elem[0]
             reference = elem[1]
             hypothesis = elem[2]
+
+            filename = os.path.basename(audio_filepath)
+
             try:
                 ref_ppl = float(elem[3])
                 hyp_ppl = float(elem[4])
@@ -57,7 +56,7 @@ if __name__ == '__main__':
                     ppl_candidate2_count += 1
 
                 if diff_ratio_a > ppl_threshold and normalized_cer > cer_threshold:
-                    print(f'\nfile: {os.path.basename(audio_filepath)}')
+                    print(f'\nfile: {filename}')
                     print(f'reference: {reference}\tppl: {ref_ppl}')
                     print(f'hypothesis: {hypothesis}\tppl: {hyp_ppl}')
                     print(f'cer: {cer:.4f}, normalized_cer: {normalized_cer:.4f}')
@@ -65,10 +64,22 @@ if __name__ == '__main__':
                     print(f'wil: {wil:.4f}, wip: {wip:.4f}')
                     count += 1
 
-    print('===== Result =====')
+                    machine_craft_file.append(filename)
+
+    print('\n===== Result =====')
     print(f'cer_threshold: {cer_threshold}')
     print(f'ppl_threshold: {ppl_threshold}')
     print(f'result count: {count}')
     print(f'cer_candidate_count: {cer_candidate_count}')
     print(f'ppl_candidate_count(ref_ppl > hyp_ppl): {ppl_candidate_count}')
     print(f'ppl_candidate2_count(threshfold): {ppl_candidate2_count}')
+
+    return machine_craft_file
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_file', default='input.csv', type=str)
+    args = parser.parse_args()
+
+    machine_craft_file = get_annotate_error_candidates(args.input_file)
