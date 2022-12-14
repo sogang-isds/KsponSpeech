@@ -4,10 +4,7 @@ import os
 from math import log
 
 
-def get_annotate_error_candidates(input_file):
-    cer_threshold = 0.0944
-    # cer_threshold = 0.25
-    ppl_threshold = 0.15
+def get_annotate_error_candidates(input_file, cer_threshold=0.1, ppl_threshold=0.2, verbose=True):
     cer_candidate_count = 0
     ppl_candidate_count = 0
     ppl_candidate2_count = 0
@@ -76,14 +73,16 @@ def get_annotate_error_candidates(input_file):
                     ppl_candidate2_count += 1
 
                 if diff_ratio_a > ppl_threshold and normalized_cer > cer_threshold:
-                    # if normalized_cer2 > cer_threshold:
-                    # if diff_ratio_a > ppl_threshold:
-                    print(f'\nfile: {filename}')
-                    print(f'reference: {reference}\tppl: {ref_ppl}')
-                    print(f'hypothesis: {hypothesis}\tppl: {hyp_ppl}')
-                    print(f'cer: {cer:.4f}, normalized_cer: {normalized_cer:.4f}')
-                    print(f'diff_ratio_a: {diff_ratio_a:.4f}, diff_ratio_b: {diff_ratio_b:.4f}')
-                    print(f'wil: {wil:.4f}, wip: {wip:.4f}')
+                # if 1 == 1:
+                # if normalized_cer > cer_threshold:
+                # if diff_ratio_a > ppl_threshold:
+                    if verbose:
+                        print(f'\nfile: {filename}')
+                        print(f'reference: {reference}\tppl: {ref_ppl}')
+                        print(f'hypothesis: {hypothesis}\tppl: {hyp_ppl}')
+                        print(f'cer: {cer:.4f}, normalized_cer: {normalized_cer:.4f}')
+                        print(f'diff_ratio_a: {diff_ratio_a:.4f}, diff_ratio_b: {diff_ratio_b:.4f}')
+                        print(f'wil: {wil:.4f}, wip: {wip:.4f}')
                     relevant_count += 1
 
                     machine_craft_file.append(filename)
