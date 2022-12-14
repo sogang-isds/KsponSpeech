@@ -1,10 +1,12 @@
 import argparse
 import csv
 import os
+from math import log
 
 
 def get_annotate_error_candidates(input_file):
-    cer_threshold = 0.02
+    cer_threshold = 0.0944
+    # cer_threshold = 0.25
     ppl_threshold = 0.15
     cer_candidate_count = 0
     ppl_candidate_count = 0
@@ -16,8 +18,21 @@ def get_annotate_error_candidates(input_file):
         reader = csv.reader(f)
         header = next(reader)
 
-        max_len = 116
         count = 0
+
+        max_hyp_len = 0
+        for i, elem in enumerate(reader):
+            reference = elem[1]
+            hypothesis = elem[2]
+
+            ref_len = len(reference)
+            hyp_len = len(hypothesis)
+
+            if hyp_len > max_hyp_len:
+                max_hyp_len = hyp_len
+
+        print(f'max_hyp_len: {max_hyp_len}')
+        f.seek(0)
 
         for i, elem in enumerate(reader):
 
@@ -41,14 +56,17 @@ def get_annotate_error_candidates(input_file):
             ref_len = len(reference)
             hyp_len = len(hypothesis)
 
-            normalized_cer = cer * hyp_len / max_len
+            normalized_cer = cer * log(hyp_len) / log(max_hyp_len)
+            # normalized_cer = wer * log(hyp_len) / log(max_hyp_len)
+            # normalized_cer = cer
 
             if normalized_cer > cer_threshold:
                 cer_candidate_count += 1
 
             if ref_ppl > hyp_ppl:
-                diff_ratio_a = (ref_ppl - hyp_ppl) / ref_ppl
-                diff_ratio_b = (ref_ppl - hyp_ppl) / hyp_ppl
+                # if ref_ppl < hyp_ppl:
+                diff_ratio_a = abs(ref_ppl - hyp_ppl) / ref_ppl
+                diff_ratio_b = abs(ref_ppl - hyp_ppl) / hyp_ppl
 
                 ppl_candidate_count += 1
 
@@ -56,6 +74,8 @@ def get_annotate_error_candidates(input_file):
                     ppl_candidate2_count += 1
 
                 if diff_ratio_a > ppl_threshold and normalized_cer > cer_threshold:
+                    # if normalized_cer2 > cer_threshold:
+                    # if diff_ratio_a > ppl_threshold:
                     print(f'\nfile: {filename}')
                     print(f'reference: {reference}\tppl: {ref_ppl}')
                     print(f'hypothesis: {hypothesis}\tppl: {hyp_ppl}')
@@ -66,7 +86,7 @@ def get_annotate_error_candidates(input_file):
 
                     machine_craft_file.append(filename)
 
-    print('\n===== Result =====')
+    print(f'\n===== Error Candidate Result =====')
     print(f'cer_threshold: {cer_threshold}')
     print(f'ppl_threshold: {ppl_threshold}')
     print(f'result count: {count}')
