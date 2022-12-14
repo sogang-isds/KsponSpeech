@@ -18,10 +18,12 @@ def get_annotate_error_candidates(input_file):
         reader = csv.reader(f)
         header = next(reader)
 
-        count = 0
+        relevant_count = 0
+        total_count = 0
 
         max_hyp_len = 0
         for i, elem in enumerate(reader):
+            total_count += 1
             reference = elem[1]
             hypothesis = elem[2]
 
@@ -82,14 +84,14 @@ def get_annotate_error_candidates(input_file):
                     print(f'cer: {cer:.4f}, normalized_cer: {normalized_cer:.4f}')
                     print(f'diff_ratio_a: {diff_ratio_a:.4f}, diff_ratio_b: {diff_ratio_b:.4f}')
                     print(f'wil: {wil:.4f}, wip: {wip:.4f}')
-                    count += 1
+                    relevant_count += 1
 
                     machine_craft_file.append(filename)
 
     print(f'\n===== Error Candidate Result =====')
     print(f'cer_threshold: {cer_threshold}')
     print(f'ppl_threshold: {ppl_threshold}')
-    print(f'result count: {count}')
+    print(f'detection ratio: {relevant_count/total_count * 100:.2f} ({relevant_count}/{total_count})')
     print(f'cer_candidate_count: {cer_candidate_count}')
     print(f'ppl_candidate_count(ref_ppl > hyp_ppl): {ppl_candidate_count}')
     print(f'ppl_candidate2_count(threshfold): {ppl_candidate2_count}')
