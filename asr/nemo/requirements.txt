@@ -1,3 +1,4 @@
+numba==0.56.2
 tokenizers
 nemo-toolkit==1.11.0
 pytorch-lightning==1.6.4
