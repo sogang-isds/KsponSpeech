@@ -1,13 +1,12 @@
 import os
 import json
 import pandas as pd
-import csv
 
 from asr.measurement.analyze import get_annotate_error_candidates
 
 
 def check_after_machine_in_the_loop():
-    final_reference = []
+    modified_text_list = []
     human_craft_file = []
     machine_craft_file = []
 
@@ -15,13 +14,17 @@ def check_after_machine_in_the_loop():
         data = json.load(f)
 
     for d in data:
-        final_reference.append(d['meta'][0]['text'])
+        modified_text_list.append(d['meta'][0]['text'])
 
     metric_result_file = '../../eval_clean_add_metrics.csv'
     # metric_result_file = '../../eval_clean_add_metrics_squeezeformer.csv'
     text_clean = pd.read_csv(metric_result_file)
 
-    for file, origin, ref in zip(text_clean['audio_filepath'], text_clean['reference'], final_reference):
+    pred_list = list(text_clean['hypothesis'])
+    truth_list = list(text_clean['reference'])
+    filepath_list = list(text_clean['audio_filepath'])
+
+    for file, origin, ref in zip(filepath_list, truth_list, modified_text_list):
         if origin != ref:
             human_craft_file.append(os.path.basename(file))
 
@@ -34,14 +37,13 @@ def check_after_machine_in_the_loop():
                                                                ppl_threshold=ppl_threshold,
                                                                verbose=False)
 
-            final_file = []
+            mixed_list = []
 
-            for file, origin_ref, change in zip(text_clean['audio_filepath'], text_clean['reference'], final_reference):
+            for file, origin_text, modified_text in zip(filepath_list, truth_list, modified_text_list):
                 if os.path.basename(file) in machine_craft_file:
-                    final_file.append(change)
+                    mixed_list.append(modified_text)
                 else:
-                    final_file.append(origin_ref)
-
+                    mixed_list.append(origin_text)
 
             human_machine_intersection = set(human_craft_file).intersection(set(machine_craft_file))
             precision = len(human_machine_intersection) / len(machine_craft_file)
@@ -60,9 +62,9 @@ def check_after_machine_in_the_loop():
             from evaluate import load
             cer = load("cer")
 
-            print("\n원래 CER: ", cer.compute(predictions=list(text_clean['hypothesis']), references=list(text_clean['reference'])))
-            print("machine-in-the-loop으로 바꿨다 가정했을 때: ", cer.compute(predictions=list(text_clean['hypothesis']), references=final_file))
-            print("only human으로만 바꿨을 때", cer.compute(predictions=list(text_clean['hypothesis']), references=final_reference))
+            print("\n원래 CER: ", cer.compute(predictions=pred_list, references=truth_list))
+            print("machine-in-the-loop으로 바꿨다 가정했을 때: ", cer.compute(predictions=pred_list, references=mixed_list))
+            print("only human으로만 바꿨을 때", cer.compute(predictions=pred_list, references=modified_text_list))
 
 
 if __name__ == '__main__':
