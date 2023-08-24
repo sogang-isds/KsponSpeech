@@ -62,9 +62,9 @@ def check_after_machine_in_the_loop():
             from evaluate import load
             cer = load("cer")
 
-            print("\n원래 CER: ", cer.compute(predictions=pred_list, references=truth_list))
-            print("machine-in-the-loop으로 바꿨다 가정했을 때: ", cer.compute(predictions=pred_list, references=mixed_list))
-            print("only human으로만 바꿨을 때", cer.compute(predictions=pred_list, references=modified_text_list))
+            print(f"\n원래 CER: {cer.compute(predictions=pred_list, references=truth_list):.4f}")
+            print(f"machine-in-the-loop으로 바꿨다 가정했을 때: {cer.compute(predictions=pred_list, references=mixed_list):.4f}")
+            print(f"only human으로만 바꿨을 때: {cer.compute(predictions=pred_list, references=modified_text_list):.4f}")
 
 
 if __name__ == '__main__':
